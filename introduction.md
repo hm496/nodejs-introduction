@@ -18,14 +18,14 @@ Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine.
 ### b）基本原理
 
 下面是一张 Node.js 的架构图，
-它简要的介绍了 Node.js 是基于 Chrome V8引擎构建的，由事件循环（Event Loop）分发 I/O 任务，最终工作线程（Work Thread）将任务丢到线程池（Thread Pool）里去执行，而事件循环只要等待执行结果就可以了。
+它简要的介绍了 Node.js 是基于 Chrome V8引擎构建的，由事件循环（Event Loop）分发 I/O 任务，最终工作线程（Work Thread）将任务丢到线程池（Thread Pool）里去执行，而事件循环（Event Loop）只要等待执行结果就可以了。
 
 ![](https://raw.githubusercontent.com/i5ting/How-to-learn-node-correctly/master/media/14912707129964/14912763353044.png)
 
 - Node.js 基于 Chrome V8 引擎
 - JavaScript 语言的一大特点就是单线程，同一个时间只能做一件事
 - 单线程就意味着，所有任务需要排队，一个一个执行.
-- 但排队很多时候是 CPU 空闲, 而要等待很慢的 I/O, CPU 完全可以不管 I/O 设备，挂起处于等待中的任务，先运行排在后面的任务
+- 但排队很多时候是 CPU 空闲, 而要等待很慢的 I/O. 而 Node.js 的非阻塞异步 I/O 模型可以很好的解决这个问题.
 
 ![](https://raw.githubusercontent.com/i5ting/How-to-learn-node-correctly/master/media/14912707129964/14992384974942.png)
 
@@ -43,7 +43,7 @@ Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine.
 Node.js 其实就是帮我们构建类似的机制。我们在写代码的时候，实际上就是取号的过程，由 Event Loop 来接受处理，而真正执行操作的是具体的线程池里的 I/O 任务。之所以说 Node.js 是单线程，就是因为在接受任务的时候是单线程的，它无需进程/线程切换上下文的成本，非常高效，但它在执行具体任务的时候是多线程的。
 
 ## Part 1：Event Loop(事件循环)
-先拿定时器举例,
+先拿定时器举例,  
 定时器是最简单的异步调用
 ```javascript
 setTimeout(function() {
@@ -51,34 +51,21 @@ setTimeout(function() {
 },0);
 ```
 每次设置定时器,其实是将一个回调函数  
-放入一个先进先出(FIFO)的队列中,  
+放入一个先进先出的队列中,  
 只要还有异步任务未执行,  
 事件循环,就会一轮又一轮的执行,  
-每一次都去检查系统时间,是否满足定时器条件.  
-满足条件则执行回调函数. 
-
-Node.js Event loop 完整过程示例:  
-每一次 Event loop 经过以下几个阶段:
-```
-   ┌───────────────────────┐
-┌─>│        timers         │ (setTimeout,setInterval)
-│  └──────────┬────────────┘
-│  ┌──────────┴────────────┐
-│  │     I/O callbacks     │
-│  └──────────┬────────────┘
-│  ┌──────────┴────────────┐
-│  │     idle, prepare     │
-│  └──────────┬────────────┘      ┌───────────────┐
-│  ┌──────────┴────────────┐      │   incoming:   │
-│  │         poll          │<─────┤  connections, │
-│  └──────────┬────────────┘      │   data, etc.  │
-│  ┌──────────┴────────────┐      └───────────────┘
-│  │        check          │
-│  └──────────┬────────────┘
-│  ┌──────────┴────────────┐
-└──┤    close callbacks    │
-   └───────────────────────┘
-```
+事件循环每一次都会去检查系统时间,是否满足定时器条件.  
+满足条件则执行队列中满足条件的回调函数. 
+   
+Node.js Event Loop 完整过程示例:   
+Node 只有一个主线程，事件循环是在主线程上完成的。    
+Event Loop开始执行前,
+会先完成 所有的同步任务、设置定时器、发出异步请求、发出异步I/O等等,    
+最后，等完成这些之后，事件循环才会开始。     
+事件循环会一轮又一轮地执行，直到所有异步任务都执行完成。   
+   
+每一次 Event Loop 经过以下几个阶段:   
+![event-loop](https://static.didapinche.com/pics//g/1530329437896/event-loop.jpg)
 - timers 阶段: 这个阶段执行setTimeout(callback) and setInterval(callback)预定的callback;
 - I/O callbacks 阶段: 执行除了 close事件的callbacks、被timers(定时器，setTimeout、setInterval等)设定的callbacks、setImmediate()设定的callbacks之外的callbacks;
 - idle, prepare 阶段: 仅node内部使用;
