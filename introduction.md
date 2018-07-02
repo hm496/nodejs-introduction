@@ -66,17 +66,20 @@ setTimeout(function() {
 Node.js Event Loop 完整过程示例:
 Node 只有一个主线程，事件循环是在主线程上完成的。
 Event Loop开始执行前,
-会先完成 所有的同步任务、设置定时器、发出异步请求等等,
+会先完成 所有的同步任务、设置定时器回调函数、发出异步请求并设置回调函数 , 初始化事件循环等等,
 最后，等完成这些之后，事件循环才会开始。
-事件循环会一轮又一轮地执行，直到所有异步任务都执行完成。
+事件循环会一轮又一轮地执行，直到所有异步任务都执行完成, 退出进程。
+
+
+
+每一次 Event Loop 经过以下几个阶段:
+![event-loop](https://static.didapinche.com/pics//g/1530329437896/event-loop.jpg)
 
 Node.js 除原生定时器setTimeout,setInterval外,
 还有额外提供两个异步执行的函数setImmediate, process.nextTick();
 
-每一次 Event Loop 经过以下几个阶段:
-![event-loop](https://static.didapinche.com/pics//g/1530329437896/event-loop.jpg)
 - timers 阶段: 这个阶段执行setTimeout(callback) and setInterval(callback)预定的callback;
-- I/O callbacks 阶段: 执行除了 close事件的callbacks、被timers(定时器，setTimeout、setInterval等)设定的callbacks、setImmediate()设定的callbacks之外的callbacks(执行触发的I/O事件回调);
+- I/O callbacks 阶段: 执行除了 close事件的callbacks、被timers(定时器，setTimeout、setInterval等)设定的callbacks、setImmediate()设定的callbacks之外的callbacks();
 - idle, prepare 阶段: 仅node内部使用;
 - poll 阶段: 获取新的I/O事件, 适当的条件下node将阻塞在这里, 等待新的I/O事件触发;
 - check 阶段: 执行setImmediate() 设定的callbacks;
@@ -90,6 +93,45 @@ event loop会转入下一下阶段.
 **process.nextTick()不在event loop的任何阶段执行，而是在各个阶段切换的中间执行**,即从一个阶段切换到下个阶段前执行。
 
 ## Part 2：模块机制
+### 描述文件  `package.json` 
+
+1.  主要描述了你的项目依赖哪些模块
+
+2.  允许我们使用 “语义化版本规则”指明你项目依赖包的版本 (用 "^","~" 等符号指定版本)
+
+3.  让你的构建更好地与其他开发者分享，便于重复使用
+
+### package.json 如何创建
+
+使用 `npm init` 即可在当前目录创建一个 `package.json` ,
+
+ `package.json`  形如:
+
+```json
+{
+  "name": "koa",
+  "version": "2.5.1",
+  "description": "Koa web app framework",
+  "main": "lib/application.js",
+  "engines": {
+    "node": ">=6"
+  },
+  "dependencies": {
+    "cookies": "~0.7.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.17.1",
+    "jest": "20.0.0"
+  }
+}
+```
+
+"cookies": "~0.7.0" ,    中的 ~ 表示,  依赖版本为 0.7.xx,    且大于等于0.7.0
+
+"eslint": "^3.17.1" ,      中的 ^ 表示,  依赖版本为 3.xx.xx,  且大于等于3.17.1
+
+"jest": "20.0.0",            表示  依赖版本就为 20.0.0  
+
 ### 模块安装 `npm`
 
 Node.js 周边的生态也非常强大，NPM（Node包管理器）上有超过 **73万个模块**，周下载量超过 **26亿次 **
@@ -210,16 +252,18 @@ function require(...) {
 
 ### Part 3：搭建Node.js web服务器
 
-用 Node.js 实现 以下两个功能:
+- 用 Node.js 实现 以下两个功能:
+  - 简单的路由功能       (实现路由功能, 并提供数据接口)
+  - 提供静态文件服务   (读取静态资源,  html,js,css,图片等静态文件, 并由浏览器显示)
+- 涉及 Nodejs核心模块:
+  - http模块       提供了HTTP服务器和客户端功能          (path.join等)
+  - fs模块	     提供了文件系统,读写文件相关的功能    (fs.readfile等)
+  - path模块      提供了处理目录路径相关的功能            (path.join等)
+  - url模块         提供了解析 URL 字符串的一些方法       (url.parse等)
 
-- 简单的路由功能       (实现路由功能, 并提供数据接口)
-- 提供静态文件服务   (读取静态资源,  html,js,css等静态文件, 并由浏览器显示)
 
 
-
-涉及模块:
-
-TODO
+### 
 
 
 
