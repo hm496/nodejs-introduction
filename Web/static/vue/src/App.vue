@@ -146,10 +146,15 @@
         return '';
       },
       search () {
-        fetch(`/user/userinfo?cid=${this.CID}`).then(res => res.json()).then(res => {
+        let startTime = Date.now();
+        fetch(`/user/userinfo?cid=${this.CID}&_time=${startTime}`).then(res => res.json()).then(res => {
           if (res.code === 0) {
             console.log(res)
             this.tableData2 = [res.data]
+            this.$message({
+              message: '恭喜你，查询成功 耗时' + (Date.now() - startTime) + 'ms',
+              type: 'success'
+            });
           } else {
             this.$message(res.message)
           }

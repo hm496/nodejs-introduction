@@ -1,8 +1,8 @@
 // get the client
 const mysql = require('mysql2');
 
-// create the connection to database
-const connection = mysql.createConnection({
+var pool  = mysql.createPool({
+  connectionLimit: 20,
   host: '192.168.1.191',
   port: '3308',
   user: 'dida',
@@ -10,7 +10,7 @@ const connection = mysql.createConnection({
   database: 'didapinche'
 });
 
-module.exports = connection;
+module.exports = pool;
 
 // // with placeholder
 // connection.query(
