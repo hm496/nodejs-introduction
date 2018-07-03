@@ -10,16 +10,15 @@ const staticDir = "static";  // 设置静态文件目录, 请求路径匹配成�
 http.createServer((req, res) => {
   const url_parsed = url.parse(req.url, true);
   /*
-  路径: /index.html?a=1&b=2
+  路径  req.url: /user/userinfo?cid=84e4f5e6-4624-11e4-a6b0-de77df093b44
   url_parsed:
   {
-    "search": "?a=1&b=2",
+    "search": "?cid=84e4f5e6-4624-11e4-a6b0-de77df093b44",
     "query": {
-      "a": "1",
-      "b": "2"
+      "cid": "84e4f5e6-4624-11e4-a6b0-de77df093b44",
     },
-    "pathname": "/index.html",
-    "path": "/index.html?a=1&b=2"
+    "pathname": "/user/userinfo",
+    "path": "/user/userinfo?cid=84e4f5e6-4624-11e4-a6b0-de77df093b44"
   }
   * */
   req.url_parsed = url_parsed; // 将解析后的路径 挂在请求上, 供后续使用
@@ -35,17 +34,17 @@ http.createServer((req, res) => {
 
   /*
   处理其他请求
-  路由实现: 匹配路径,调用对应handle
-  /index/login    split('/') => ["","index","login"]
-  /index/userinfo
-  /index/logout
+  路由实现: 匹配路径,调用对应handle函数
+  /user/userinfo  split('/') => ["","user","userinfo"]
+  /user/login
+  /user/logout
 
   /controller/action/a/b/c  split('/') => ["","controller","action","a","b","c"]
   这里的 controller会对应到一个控制器，action对应到控制器的行为，剩余的值会作为参数
   */
-  const paths = url_parsed.pathname.split('/'); // 分割路径
-  const controller = paths[1] || 'index'; // 获取 controller 名
-  const action = (paths[2] || 'index') + "Action"; // 获取 action 名
+  const paths = url_parsed.pathname.split('/'); // 分割路径 //  ["","user","userinfo"]
+  const controller = paths[1] || 'index'; // 获取 controller 名  //  "user"
+  const action = (paths[2] || 'index') + "Action"; // 获取 action 名  //  "userinfo" + "Action" => "userinfoAction"
 
   const args = paths.slice(3);
   if (handles[controller] && handles[controller][action]) {

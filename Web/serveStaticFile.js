@@ -10,14 +10,17 @@ function send404 (res) {
 }
 
 function set_header_MIME (res, absPath) {
+  // absPath /static/img/bg001.jpg
+
   let ext = absPath.match(/[^.]+$/);
   if (ext && ext[0]) {
-    res.writeHead(200, { 'Content-Type': getType(ext[0]) }); // 设置http响应头 Content-Type
+    res.writeHead(200, { 'Content-Type': getType(ext[0]) }); // 设置http响应头 Content-Type   // "image/jpeg"
     // res.writeHead(200, { 'Content-Type': 'applicatoin/octet-stream' }); // 需要浏览器下载文件时, 设置为 applicatoin/octet-stream
   }
 }
 
 function serveStatic (req, res) {
+  // req.url_parsed.pathname  =>  /static/img/bg001.jpg
   let absPath = path.join(__dirname, req.url_parsed.pathname);  // 获取文件绝对路径
 
   if (absPath.endsWith("\\")) {
@@ -30,6 +33,9 @@ function serveStatic (req, res) {
   }
 
   fs.readFile(absPath, function (err, data) {
+    // 如果有错误err 为错误
+    // 没有错误 err  默认为null
+
     //readFile回调函数
     if (err) {
       console.log(err);

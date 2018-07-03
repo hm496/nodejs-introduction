@@ -132,6 +132,11 @@ event loop会转入下一下阶段.
 
 "jest": "20.0.0",            表示  依赖版本就为 20.0.0  
 
+npm install
+npm install --production
+
+
+
 ### 模块安装 `npm`
 
 Node.js 周边的生态也非常强大，NPM（Node包管理器）上有超过 **73万个模块**，周下载量超过 **26亿次 **
@@ -141,7 +146,7 @@ Node.js 周边的生态也非常强大，NPM（Node包管理器）上有超过 *
 | 名称 | 描述 | 简写 |
 | --- | --- | --- |
 | npm install xxx | 安装xxx模块，但不记录到package.json里 | npm i xxx |
-| npm install --save xxx | 安装xxx模块，并且记录到package.json里，字段对应的dependency，是产品环境必须依赖的模块 | npm i -s xxx |
+| npm install --save xxx | 安装xxx模块，并且记录到package.json里，字段对应的dependency，是生产环境必须依赖的模块 | npm i -S xxx |
 | npm install --save-dev xxx | 安装xxx模块，并且记录到package.json里，字段对应的dev-dependency，是开发环境必须依赖的模块，比如测试类的（mocha、chai、sinon、zombie、supertest等）都在 | npm i -D xxx |
 | npm install --global xxx | 全局安装xxx模块，但不记录到package.json里，如果模块里package.json有bin配置，会自动链接，作为cli命令 | npm i -g xxx |
 
@@ -250,20 +255,135 @@ function require(...) {
 > module.exports 和 exports 的区别: exports 仅仅是 module.exports 的一个引用
 > 给 exports 直接赋值，只是让这个变量等于另外一个引用
 
-### Part 3：搭建Node.js web服务器
+## Part 3：搭建简单 Node.js web 服务器
 
 - 用 Node.js 实现 以下两个功能:
   - 简单的路由功能       (实现路由功能, 并提供数据接口)
   - 提供静态文件服务   (读取静态资源,  html,js,css,图片等静态文件, 并由浏览器显示)
 - 涉及 Nodejs核心模块:
-  - http模块       提供了HTTP服务器和客户端功能          (path.join等)
-  - fs模块	     提供了文件系统,读写文件相关的功能    (fs.readfile等)
-  - path模块      提供了处理目录路径相关的功能            (path.join等)
+  - http模块       提供了HTTP服务器和客户端功能          (http.createServer,  http.request等)
+  - 
+  	 fs模块	     提供了文件系统,读写文件相关的功能    (fs.readfile, fs.readfile等)
+  - path模块      提供了处理目录路径相关的功能            (path.join, path.resolve等)
   - url模块         提供了解析 URL 字符串的一些方法       (url.parse等)
 
+#### Hello Node.js
+
+ ```javascript
+const http = require('http');  // Node内置的 http模块  提供了HTTP服务器和客户端功能
+http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/html' }); // 设置http响应头
+  res.end(`<div style="border:2px solid red;">Hello Node.js</div>`); // 设置http响应体
+}).listen(6789, '0.0.0.0');   // 监听 6789 端口
+ ```
 
 
-### 
+
+## Part 4：Node.js 如何处理异步 (异步流程控制)
+
+####  1) 异步流程控制重点
+
+![async](https://raw.githubusercontent.com/i5ting/How-to-learn-node-correctly/master/media/14913280187332/Screen%20Shot%202017-04-05%20at%2008.43.34.png)
+
+
+1. Node.js SDK 里原生 callback ;
+2. Node.js 异步流程控制重点:   Promise 与 Async函数;
+    1. 中流砥柱：Promise 
+    2. 终极解决方案：Async/Await 
+
+
+
+#### 2)  Node.js SDK 的回调函数采用  **Error-first Callback** (错误优先) 的写法:
+
+
+```javascript
+// 读取文件
+fs.readFile("user.txt", function (err, data) {
+    // 处理错误 和 正常逻辑
+});
+```
+
+- 回调函数的第一个参数返回的 error 对象，如果 error 发生了，它会作为第一个err参数返回，如果没有错误，返回 `null`。
+- 回调函数的第二个参数返回的是任何成功响应的结果数据。如果结果正常，没有error发生，err会被设置为`null`，并在第二个参数就出返回成功结果数据。
+
+如果进行 几个异步操作, 每一步都需要上一个异步操作 的结果作为参数,   这种写法很容易出现 **回调嵌套** 的问题 :
+
+```javascript
+step1(function (value1) {
+    step2(value1, function(value2) {
+        step3(value2, function(value3) {
+            step4(value3, function(value4) {
+                // Do something with value4
+            });
+        });
+    });
+});
+```
+
+这里只是做4步, 嵌套了4层回调, 如果更多步骤呢？
+
+
+
+#### 3)  中流砥柱  Promise :
+
+Promise意味着[许愿|承诺]一个还没有完成的操作，但在未来会完成的。与Promise最主要的交互方法是通过将函数传入它的then方法从而获取得Promise最终的值或Promise最终最拒绝（reject）的原因。要点有三个：
+
+- 递归，每个异步操作返回的都是promise对象
+- 状态机：三种状态转换，只在promise对象内部可以控制，外部不能改变状态
+- 全局异常处理
+
+1)定义 
+
+```javascript
+var promise = new Promise(function(resolve, reject) {
+  // do a thing, possibly async, then…
+
+  if (/* everything turned out fine */) {
+    resolve("Stuff worked!");
+  }
+  else {
+    reject(Error("It broke"));
+  }
+});
+```
+
+每个Promise定义都是一样的，在构造函数里传入一个匿名函数，参数是resolve和reject，分别代表成功和失败时候的处理。 
+
+2)使用
+
+```javascript
+promise.then(function(text){
+    console.log(text)// Stuff worked!
+    return Promise.reject(new Error('我是故意的'))
+}).catch(function(err){
+    console.log(err)
+})
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

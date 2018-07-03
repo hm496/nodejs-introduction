@@ -1,0 +1,33 @@
+{
+  "name": "app",
+  "version": "0.1.0",
+  "dependencies": {},
+  "scripts": {
+    "start": "vue-maker start",
+    "build": "vue-maker build",
+    "test": "vue-maker test --env=jsdom"
+  },
+  "homepage": "./",
+  "buildPath": "build",
+  "proxy": {
+    "['!**.js','!**.css','!**.jpg','!**.png','!**.gif','!**.ico','!**.json','!**.svg','!**.eot','!**.ttf','!**.woff','!**.woff2']": {
+      "target": "http://localhost:6789",
+      "secure": false,
+      "changeOrigin": true
+    }
+  },
+  "__comment__proxyTest": "http://localhost:5555",
+  "__comment__proxyDev": "http://localhost:6666",
+  "__comment__proxyOnline": "http://localhost:7777",
+  "DEV_SERVER_CONFIG": {
+    "port": 3100
+  },
+  "WEBPACK_CONFIG": {
+    "alias": {
+      "@template": "./"
+    },
+    "externals": {
+      "vue":"window.Vue"
+    }
+  }
+}

@@ -1,16 +1,27 @@
 const wanfeifei = require('./sql.js');
 
 module.exports = {
-  // index controller
-  index: {
+  // user controller
+  user: {
     // userinfo action
     userinfoAction (req, res, ...other) {
       if (req.url_parsed.query && req.url_parsed.query.cid) {
-        wanfeifei.query(`SELECT id,cid,account_id FROM user_user WHERE cid = ?`,
+        wanfeifei.query(`SELECT * FROM user_user WHERE cid = ?`,
           [req.url_parsed.query.cid],
           function (err, results) {
             res.writeHead(200, { 'Content-Type': 'application/json' }); // 设置json MIME
-            res.end(JSON.stringify(results));
+            if(results[0]){
+              res.end(JSON.stringify({
+                code: 0,
+                data: results[0],
+                message:""
+              }));
+            } else {
+              res.end(JSON.stringify({
+                code: 104,
+                message: "该用户不存在",
+              }));
+            }
           });
       } else {
         const data = {
@@ -37,7 +48,8 @@ module.exports = {
         message: "退出成功!"
       }
       res.writeHead(200, { 'Content-Type': 'application/json' }); // 设置json MIME
-      res.end(JSON.stringify(data));
+      res.write(JSON.stringify(data));
+      res.end();
     }
   }
 }
