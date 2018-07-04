@@ -33,7 +33,7 @@ function serveStatic (req, res) {
   }
 
   fs.readFile(absPath, function (err, data) {
-    // 如果有错误err 为错误
+    // 如果有错误err 为错误实例
     // 没有错误 err  默认为null
 
     //readFile回调函数

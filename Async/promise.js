@@ -20,4 +20,3 @@ a.then(function (data) {
 }).catch(function (e) {
   console.log("错误3")
 });
-

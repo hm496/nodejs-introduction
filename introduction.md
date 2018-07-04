@@ -43,8 +43,8 @@ Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine.
 梳理一下,  核心:
 - Chrome V8 负责解释并执行 JavaScript 代码
 - `libuv` 由事件循环和线程池组成，负责所有 I/O 任务的分发与执行
-- Node.js Bindings层, 负责将 libuv 暴露的 `C/C++` 接口绑定到 Chrome V8 转成 JavaScript Api , 
-  并且结合这些 Api 编写了 Node.js 标准库，所有这些 Api 统称为 Node.js SDK
+- Node.js Bindings层, 负责将 libuv 暴露的 `C/C++` 接口绑定到 Chrome V8 引擎转成 JavaScript Api , 
+  并且结合这些 Api 编写了 Node.js 标准库，所有这些 Api 统称为 Node.js SDK, 核心模块
 
 ## Part 1：Event Loop(事件循环)
 先拿定时器举例,
@@ -52,14 +52,14 @@ Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine.
 ```javascript
 setTimeout(function() {
   // bala bala
-},0);
+},1000);
 ```
 每次设置定时器,其实是将一个回调函数
 放入一个队列中,
 只要还有异步任务未执行,
-事件循环,就会一轮又一轮的一直执行,
-每一轮都会去检查系统时间,是否满足定时器条件.
-满足条件则执行队列中满足条件的回调函数.
+事件循环,就会一直轮询检查系统时间,
+是否满足定时器条件.
+满足条件则执行队列中 所有满足条件的回调函数.
 
 
 
@@ -68,7 +68,7 @@ Node 只有一个主线程，事件循环是在主线程上完成的。
 Event Loop开始执行前,
 会先完成 所有的同步任务、设置定时器回调函数、发出异步请求并设置回调函数 , 初始化事件循环等等,
 最后，等完成这些之后，事件循环才会开始。
-事件循环会一轮又一轮地执行，直到所有异步任务都执行完成, 退出进程。
+事件循环会一轮又一轮地执行，直到所有异步任务都执行完成后,  退出主进程。
 
 
 
@@ -76,17 +76,17 @@ Event Loop开始执行前,
 ![event-loop](https://static.didapinche.com/pics//g/1530329437896/event-loop.jpg)
 
 Node.js 除原生定时器setTimeout,setInterval外,
-还有额外提供两个异步执行的函数setImmediate, process.nextTick();
+还提供两个非I/O操作的异步函数setImmediate, process.nextTick();
 
 - timers 阶段: 这个阶段执行setTimeout(callback) and setInterval(callback)预定的callback;
-- I/O callbacks 阶段: 执行除了 close事件的callbacks、被timers(定时器，setTimeout、setInterval等)设定的callbacks、setImmediate()设定的callbacks之外的callbacks();
-- idle, prepare 阶段: 仅node内部使用;
-- poll 阶段: 获取新的I/O事件, 适当的条件下node将阻塞在这里, 等待新的I/O事件触发;
+- I/O callbacks 阶段: 执行除了 close事件的callbacks、定时器(setTimeout、setInterval等)设定的callbacks、setImmediate设定的callbacks之外的callbacks;
+- idle, prepare 阶段: 仅node内部使用,为poll 阶段 做准备;
+- poll 阶段: 获取新的I/O事件, 适当的条件(没有定时器到期,没有其他阶段的异步回调)下node将阻塞在这里, 等待新的I/O事件触发并执行回调函数;
 - check 阶段: 执行setImmediate() 设定的callbacks;
-- close callbacks 阶段: 比如socket.on(‘close’, callback)的callback会在这个阶段执行.
+- close callbacks 阶段: close事件的callbacks,比如socket.on(‘close’, callback)的callback会在这个阶段执行.
 
 每一个阶段都有一个装有callbacks的fifo queue(队列)，当event loop运行到一个指定阶段时，
-node将执行该阶段的fifo queue(队列)，当队列callback执行完或者执行callbacks数量超过该阶段的上限时，
+node将执行该阶段队列的回调函数，当队列callback执行完或者执行callbacks数量超过该阶段的上限时，
 event loop会转入下一下阶段.
 
 **注意上面六个阶段都不包括 process.nextTick()**
@@ -117,7 +117,7 @@ event loop会转入下一下阶段.
     "node": ">=6"
   },
   "dependencies": {
-    "cookies": "~0.7.0"
+    "cookies": "~0.7.10"
   },
   "devDependencies": {
     "eslint": "^3.17.1",
@@ -126,11 +126,11 @@ event loop会转入下一下阶段.
 }
 ```
 
-"cookies": "~0.7.0" ,    中的 ~ 表示,  依赖版本为 0.7.xx,    且大于等于0.7.0
+"cookies": "~0.7.10" ,    中的 ~ 表示,  依赖版本为 0.7.xx,    且大于等于0.7.10
 
 "eslint": "^3.17.1" ,      中的 ^ 表示,  依赖版本为 3.xx.xx,  且大于等于3.17.1
 
-"jest": "20.0.0",            表示  依赖版本就为 20.0.0  
+"jest": "20.0.0",            表示  依赖版本就为固定 20.0.0  
 
 npm install
 npm install --production
@@ -145,9 +145,9 @@ Node.js 周边的生态也非常强大，NPM（Node包管理器）上有超过 *
 
 | 名称 | 描述 | 简写 |
 | --- | --- | --- |
-| npm install xxx | 安装xxx模块，但不记录到package.json里 | npm i xxx |
-| npm install --save xxx | 安装xxx模块，并且记录到package.json里，字段对应的dependency，是生产环境必须依赖的模块 | npm i -S xxx |
-| npm install --save-dev xxx | 安装xxx模块，并且记录到package.json里，字段对应的dev-dependency，是开发环境必须依赖的模块，比如测试类的（mocha、chai、sinon、zombie、supertest等）都在 | npm i -D xxx |
+| npm install xxx | 安装xxx模块，并且记录到package.json里，字段对应的dependencies，是生产环境必须依赖的模块 | npm i xxx |
+| npm install --save xxx | 安装xxx模块，并且记录到package.json里，字段对应的dependencies，是生产环境必须依赖的模块 | npm i -S xxx |
+| npm install --save-dev xxx | 安装xxx模块，并且记录到package.json里，字段对应的devDependencies，是开发环境必须依赖的模块，比如测试类的（mocha、chai、sinon、zombie、supertest等）都在 | npm i -D xxx |
 | npm install --global xxx | 全局安装xxx模块，但不记录到package.json里，如果模块里package.json有bin配置，会自动链接，作为cli命令 | npm i -g xxx |
 
 
@@ -169,11 +169,10 @@ Node.js 根据引用的标识符**查找**模块:
 - 如果是文件模块,则去加载对应路径的 js 文件;
 
 - 如果是自定义模块,即非核心模块,
-先在运行目录的 node_modules 中查找模块,
-没找到,就往上级目录中的 node_modules 查找,
-一层一层往上级目录 node_modules 查找,
-直到根目录 node_modules 查找,
-然后再去环境变量 NODE_PATH 指定的目录查找.
+  先在运行目录的 node_modules 中查找模块,
+  没找到,就往上级目录中的 node_modules 查找,
+  一层一层往上级目录 node_modules 查找,
+  直到根目录 node_modules 查找,
 
 ### 模块导出
 
@@ -241,17 +240,27 @@ function require(...) {
   var module = { exports: {} };
   ((module, exports) => {
      // ------ 模块代码 开始------
-     module.exports = {
-       name: 'Bob',
-       add: function (a, b) {
-         return a + b;
-       }
-     }
+        exports = {
+          name: 'Bob',
+        }
      // ------ 模块代码 结束------
   })(module, module.exports);
   return module.exports;
 }
 ```
+```javascript
+module.exports = {};
+let exports = module.exports;
+
+exports = {
+    name: 'Bob'
+};
+
+// module.exports !== exports;
+
+return module.exports;
+```
+
 > module.exports 和 exports 的区别: exports 仅仅是 module.exports 的一个引用
 > 给 exports 直接赋值，只是让这个变量等于另外一个引用
 
@@ -286,14 +295,14 @@ http.createServer((req, res) => {
 ![async](https://raw.githubusercontent.com/i5ting/How-to-learn-node-correctly/master/media/14913280187332/Screen%20Shot%202017-04-05%20at%2008.43.34.png)
 
 
-1. Node.js SDK 里原生 callback ;
+1. Node.js SDK 里原生API都是 callback ;
 2. Node.js 异步流程控制重点:   Promise 与 Async函数;
     1. 中流砥柱：Promise 
     2. 终极解决方案：Async/Await 
 
 
 
-#### 2)  Node.js SDK 的回调函数采用  **Error-first Callback** (错误优先) 的写法:
+#### 2)  Node.js SDK 的回调函数采用  Error-first Callback (错误优先) 的写法:
 
 
 ```javascript
