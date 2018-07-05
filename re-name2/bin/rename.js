@@ -8,10 +8,10 @@ const args = process.argv.slice(2);
 const { dateFmt } = require('../utils.js');
 
 const processDir = fs.realpathSync(process.cwd());
-
+// re-name *.png *.jpg -o @yyyyMMdd hhmmss@$name$$i$.$ext$
 class RenameCli {
   constructor (args) {
-    this.$outFmt$ = ""; // 输出格式 路径  // @yyyyMMdd@$FileName$$I$.$FileExt$
+    this.$outFmt$ = ""; // 输出格式 路径  // @yyyyMMdd hhmmss@$name$$i$.$ext$
     this.$filePattern$ = []; // 文件匹配规则 // *.png
     this.initOption(args);
 

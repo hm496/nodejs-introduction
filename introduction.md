@@ -6,11 +6,13 @@
 Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine.
 ```
 
-- Node.js 是 JavaScript 运行时环境，同时扩展了 js 功能，使之支持 I/O 、文件系统等只有后端语言才有的特性，使 JS 既可以操作浏览器 又可以进行I/O 、文件读写、操作数据库等.
+- Node.js 是 JavaScript 运行时环境, 就和浏览器一样, 浏览器也是一个 JavaScript 运行时环境，Node.js 扩展了 js 功能，使之支持 I/O操作 、文件系统等只有后端语言才有的特性.
 
-- Node.js 构建在著名的 Chrome's V8 JavaScript 引擎之上，Chrome V8 引擎以 C/C++ 为主，相当于使用 JavaScript 写法，转成 C/C++ 调用，大大的降低了学习成本
+- Node.js 构建在著名的 Chrome's V8 引擎之上，Chrome V8 引擎以 C/C++ 为主，相当于使用 JavaScript 写法，转成 C/C++ 调用，大大的降低了学习成本
 
-- 事件驱动（event-driven），非阻塞 I/O 模型（non-blocking I/O model），就是每个函数都是异步的，最后由 C/C++ 编写的事件循环处理库来处理这些 I/O 操作，隐藏了非阻塞 I/O 的具体细节，简化并发编程模型，让你可以轻松的编写高性能的Web应用，所以它是轻量（lightweight）且高效（efficient）的
+- 事件驱动（event-driven），非阻塞异步 I/O 模型（non-blocking I/O model），就是每个I/O操作都是异步的，最后由 C/C++ 编写的事件循环处理库来处理这些 I/O 操作，隐藏了非阻塞 I/O 的具体细节，简化并发编程模型，让你可以轻松的编写高性能的Web应用，所以它是轻量（lightweight）且高效（efficient）的
+
+  ![chrome vs nodejs](https://raw.githubusercontent.com/hm496/nodejs-introduction/master/img/chrome_nodejs.png)
 
 ### b）基本原理
 
@@ -335,66 +337,155 @@ step1(function (value1) {
 
 #### 3)  中流砥柱  Promise :
 
-Promise意味着[许愿|承诺]一个还没有完成的操作，但在未来会完成的。与Promise最主要的交互方法是通过将函数传入它的then方法从而获取得Promise最终的值或Promise最终最拒绝（reject）的原因。要点有三个：
+Promise意味着[许愿|承诺]一个还没有完成的操作，但在未来会完成的。
 
-- 递归，每个异步操作返回的都是promise对象
-- 状态机：三种状态转换，只在promise对象内部可以控制，外部不能改变状态
-- 全局异常处理
+- 每个 Promise 操作都返回  Promise  实例对象
+- Promise 有三种状态:  未完成 pending,   成功 resolved,   失败 rejected
 
 1)定义 
+所有Promise定义都是一样的，在构造函数里传入一个匿名函数，参数是resolve和reject，分别代表成功和失败时候的处理。
 
 ```javascript
 var promise = new Promise(function(resolve, reject) {
   // do a thing, possibly async, then…
-
   if (/* everything turned out fine */) {
     resolve("Stuff worked!");
-  }
-  else {
+  } else {
     reject(Error("It broke"));
   }
 });
 ```
 
-每个Promise定义都是一样的，在构造函数里传入一个匿名函数，参数是resolve和reject，分别代表成功和失败时候的处理。 
+2)API 及 使用
 
-2)使用
+##### 与Promise最主要的交互方法是:
+
+1. 将回调函数 传入它的 then  方法 ,   从而获得 Promise  成功时 resolve  的值 ,
+2. 将回调函数 传入它的 catch 方法 ,  从而获得 Promise  失败时 reject     的值.
+
+##### Promise 实例,  有2个 实例方法:
+
+- promise.then()
+- promise.catch()
 
 ```javascript
+var promise = new Promise(function(resolve, reject) {
+   setTimeout(function() {
+       resolve("Stuff worked!");
+   }, 200)
+});
+
 promise.then(function(text){
     console.log(text)// Stuff worked!
-    return Promise.reject(new Error('我是故意的'))
+    return Promise.reject('我是故意的')
 }).catch(function(err){
-    console.log(err)
+    console.log("err:" + err)
+}).then(function(text) {
+    console.log("then:" + text)
+})
+
+// promise.then(function(res){})      用于  Promise  成功时resolve   的处理;
+// promise.catch(function(err){})     用于  Promise  失败时reject    的处理;
+
+// Promise 可以链式调用, 在then 或 catch 方法中 的返回值, 会作为参数传到后面 then 或 catch 方法中
+
+promise.then(function(text){
+    console.log(text)// Stuff worked!
+    return '我是故意的'
+}).catch(function(err) {
+    console.log("err:" + err)
+}).then(function(text) {
+    console.log("then:" + text)
 })
 ```
 
+##### Promise 类,  有4个 静态方法:
 
+- Promise.resolve(...)
+- Promise.reject(...)
+- Promise.all([...])
+- Promise.race([...])
 
+```javascript
+Promise.resolve("123");
+// 返回一个 状态为成功resolved 的 promise 实例, 
+// 用 then 的回调函数 获取所传参数;   // "123"
 
+Promise.reject("789");
+// 返回一个 状态为失败rejected 的 promise 实例, 
+// 用 catch 的回调函数 获取所传参数;  // "789"
+```
 
+```javascript
+Promise.all([promise1,promise2,promise3]);  
+// 接收一个 promise 实例数组, 
 
+// 当所有 promise 执行成功, 执行 Promise.all([...]).then() 中回调函数, 回调函数参数为 所有promise返回值的数组
 
+// 若某个 promise 执行失败, 则执行 Promise.all([...]).catch() 中回调函数, 参数为 执行失败promise 的返回值
+```
 
+```javascript
+Promise.race([promise1,promise2,promise3]);  
+// 接收一个 promise 实例数组, 
 
+// 若某个 promise 率先执行完成, 无论成功失败, 
+// 则Promise.race([...]) 变成和 率先完成的 promise 一样的状态, 返回其返回值, 
+// 成功调用 Promise.race([...]).then(), 失败调用 Promise.race([...]).catch()
+```
+##### 例子:  如何解决 callback 回调嵌套
 
+```javascript
+step1(function (value1) {
+    step2(value1, function(value2) {
+        step3(value2, function(value3) {
+            step4(value3, function(value4) {
+                // Do something with value4
+            });
+        });
+    });
+});
+```
 
+```javascript
+var promise1 = function() {
+   return new Promise(function(resolve, reject) {
+       setTimeout(function() {
+           let value1 = 1;
+           resolve(value1);
+       }, 100)
+   });
+}
 
+var promise2 = function(value1) {
+   return new Promise(function(resolve, reject) {
+       setTimeout(function() {
+           let value2 = value1 + 20;
+           resolve(value2);
+       }, 200)
+   });
+}
 
+var promise3 = function(value2) {
+   return new Promise(function(resolve, reject) {
+       setTimeout(function() {
+           let value3 = value2 + 300;
+           resolve(value3);
+       }, 300)
+   });
+}
 
+var promise4 = function(value3) {
+   return new Promise(function(resolve, reject) {
+       setTimeout(function() {
+           let value4 = value3 + 4000;
+           resolve(value4);
+       }, 400)
+   });
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+promise1().then(value1 => promise2(value1)).then(value2 => promise3(value2)).then(value3 => promise4(value3)).then(res => {
+    console.log("最终结果:" + res)
+})
+```
 
