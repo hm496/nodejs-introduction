@@ -1,0 +1,20 @@
+{
+  "name": "re-name2",
+  "version": "0.0.3",
+  "description": "rename cli",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8"
+  },
+  "bugs": {},
+  "bin": {
+    "re-name": "./bin/rename.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hm496/ki-rename.git"
+  },
+  "dependencies": {
+    "globby": "^8.0.1"
+  }
+}
