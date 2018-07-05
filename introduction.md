@@ -433,7 +433,7 @@ Promise.race([promise1,promise2,promise3]);
 // 则Promise.race([...]) 变成和 率先完成的 promise 一样的状态, 返回其返回值, 
 // 成功调用 Promise.race([...]).then(), 失败调用 Promise.race([...]).catch()
 ```
-##### 例子:  如何解决 callback 回调嵌套
+##### Promise 如何解决 callback 回调嵌套
 
 ```javascript
 step1(function (value1) {
@@ -446,6 +446,7 @@ step1(function (value1) {
     });
 });
 ```
+- Promise 写法
 
 ```javascript
 var promise1 = function() {
@@ -484,8 +485,38 @@ var promise4 = function(value3) {
    });
 }
 
-promise1().then(value1 => promise2(value1)).then(value2 => promise3(value2)).then(value3 => promise4(value3)).then(res => {
-    console.log("最终结果:" + res)
+promise1().then(value1 => promise2(value1)).then(value2 => promise3(value2)).then(value3 => promise4(value3)).then(value4 => {
+    console.log("最终结果:" + value4)
 })
+```
+
+#### 5) 终极解决方案 async / await  :
+
+```javascript
+(async() => {
+    const value1 = await promise1();  // value1 为 promise1 成功时 的返回值
+    const value2 = await promise2(value1);
+    const value3 = await promise3(value2);
+    const value4 = await promise4(value3);
+    console.log("最终结果:" + value4);
+})();
+```
+
+##### async / await 异常处理
+
+```javascript
+// 处理错误 与 处理同步错误一样, 通过try catch ;
+// catch 捕获当 promise 失败时 reject 的返回值;
+(async() => {
+    try {
+       const val1 = await Promise.resolve('val1 resolved');
+       // const val2 = await Promise.reject('val2 rejected');
+       // console.log("最终val2: " + val1);
+       
+       console.log("最终val1: " + val1);
+    } catch (e) {
+       console.log("错误 :" + e);
+    }
+})();
 ```
 
