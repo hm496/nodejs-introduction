@@ -44,9 +44,11 @@ Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine.
 
 梳理一下,  核心:
 - Chrome V8 负责解释并执行 JavaScript 代码
+
 - `libuv` 由事件循环和线程池组成，负责所有 I/O 任务的分发与执行
-- Node.js Bindings层, 负责将 libuv 暴露的 `C/C++` 接口绑定到 Chrome V8 引擎转成 JavaScript Api , 
-  并且结合这些 Api 编写了 Node.js 标准库，所有这些 Api 统称为 Node.js SDK, 核心模块
+
+-  Node.js Bindings层, 负责将 libuv 暴露的 `C/C++` 接口绑定到 Chrome V8 引擎转成 JavaScript Api , 并且结合这些 Api 编写了 Node.js 标准库，所有这些 Api 统称为 Node.js SDK, 核心模块
+
 
 ## Part 1：Event Loop(事件循环)
 先拿定时器举例,
@@ -78,7 +80,7 @@ Event Loop开始执行前,
 ![event-loop](https://static.didapinche.com/pics//g/1530329437896/event-loop.jpg)
 
 Node.js 除原生定时器setTimeout,setInterval外,
-还提供两个非I/O操作的异步函数setImmediate, process.nextTick();
+还提供 两个非I/O操作的异步函数  **setImmediate** , **process.nextTick()** ;
 
 - timers 阶段: 这个阶段执行setTimeout(callback) and setInterval(callback)预定的callback;
 - I/O callbacks 阶段: 执行除了 close事件的callbacks、定时器(setTimeout、setInterval等)设定的callbacks、setImmediate设定的callbacks之外的callbacks;
@@ -119,7 +121,7 @@ event loop会转入下一下阶段.
     "node": ">=6"
   },
   "dependencies": {
-    "cookies": "~0.7.10"
+    "cookies": "~0.7.1"
   },
   "devDependencies": {
     "eslint": "^3.17.1",
@@ -128,11 +130,11 @@ event loop会转入下一下阶段.
 }
 ```
 
-"cookies": "~0.7.10" ,    中的 ~ 表示,  依赖版本为 0.7.xx,    且大于等于0.7.10
+"cookies": "~0.7.1" ,    中的 ~ 表示,  依赖版本为 0.7.xx,    且大于等于0.7.1
 
 "eslint": "^3.17.1" ,      中的 ^ 表示,  依赖版本为 3.xx.xx,  且大于等于3.17.1
 
-"jest": "20.0.0",            表示  依赖版本就为固定 20.0.0  
+"jest": "20.0.0",             表示  依赖版本就为固定 20.0.0  
 
 npm install
 npm install --production
@@ -141,15 +143,15 @@ npm install --production
 
 ### 模块安装 `npm`
 
-Node.js 周边的生态也非常强大，NPM（Node包管理器）上有超过 **73万个模块**，周下载量超过 **26亿次 **
+Node.js 周边的生态非常强大，NPM（Node包管理器）上有超过 **73万个模块**，周下载量超过 **26亿次 **
 
 - npm基本命令
 
 | 名称 | 描述 | 简写 |
 | --- | --- | --- |
-| npm install xxx | 安装xxx模块，并且记录到package.json里，字段对应的dependencies，是生产环境必须依赖的模块 | npm i xxx |
-| npm install --save xxx | 安装xxx模块，并且记录到package.json里，字段对应的dependencies，是生产环境必须依赖的模块 | npm i -S xxx |
-| npm install --save-dev xxx | 安装xxx模块，并且记录到package.json里，字段对应的devDependencies，是开发环境必须依赖的模块，比如测试类的（mocha、chai、sinon、zombie、supertest等）都在 | npm i -D xxx |
+| npm install xxx | 安装xxx模块, 会默记录到package.json里dependencies, 添加到生产环境依赖 | npm i xxx |
+| npm install --save xxx | 安装xxx模块，并且记录到package.json里dependencies，添加到生产环境依赖 | npm i -S xxx |
+| npm install --save-dev xxx | 安装xxx模块，并且记录到package.json里，字段对应的devDependencies，是开发环境必须依赖的模块，比如测试模块的（mocha、chai、sinon、zombie、supertest等）,语法检查模块 ( eslint 等) | npm i -D xxx |
 | npm install --global xxx | 全局安装xxx模块，但不记录到package.json里，如果模块里package.json有bin配置，会自动链接，作为cli命令 | npm i -g xxx |
 
 
