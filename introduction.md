@@ -520,3 +520,27 @@ promise1().then(value1 => promise2(value1)).then(value2 => promise3(value2)).the
 })();
 ```
 
+
+
+## Part 5：Node.js 的使用场景，以模块维度划分 
+
+| 分类 | 描述 | 相关模块 |
+| --- | --- | --- |
+| 网站 | 传统 Web 网站 | `Express` / `Koa` |
+| API | 同时提供给 Android, IOS，PC, H5 等前端使用的 HTTP API 接口 | `Restify` / `HApi` |
+| PC客户端 /          编辑器 | 钉钉 PC客户端 基于 `nw.js`,  微软的 `VSCode` 编辑器 基于 `electron` | `electron`   /    `nw.js` |
+| IM即时聊天 | 实时应用，很多是基于 `WebSocket`协议的 | `Socket.io` /`ws` |
+| 反向代理 | 提供类似于 `nginx` 反向代理功能，但对前端更友好 | `anyproxy` / `http-proxy` |
+| 前端构建打包工具 | 辅助前端开发，尤其是各种预编译，构建相关的工具，能够极大的提高前端开发效率:    将ES6语法转为ES5 语法, 将less, sass等css预编译语言转为css,并自动处理一些css兼容问题 | `Webpack` / `rollup` |
+| 命令行工具 | 使用命令行是非常酷的方式，前端开发自定义了很多相关工具，无论是shell命令，node脚本，还是各种脚手架等 | `Cordova` / `vue-maker` |
+| 操作系统 | 有实现，但估计不太会有人用 | `NodeOS` |
+| 爬虫 | 有大量的爬虫模块，比如crawler等，写起来要简单一些，搭配`cheerio`（node版本的 jQuery ）类库的，对前端来说尤其友好 | `crawler`/`cheerio`  |
+
+- 更多模块参考  https://github.com/sindresorhus/awesome-nodejs
+
+
+
+
+
+
+
