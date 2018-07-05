@@ -113,11 +113,11 @@
 
 <style>
   .el-table .warning-row {
-    background:oldlace;
+    background:#f5f7fa;
   }
 
   .el-table .success-row {
-    background:#f0f9eb;
+    background:#f5f7fa;
   }
 </style>
 

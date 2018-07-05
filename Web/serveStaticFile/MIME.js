@@ -228,34 +228,37 @@ const types = {
   "video/webm": ["webm"]
 };
 
-// 获取所有MIME
-const types_keys = Object.keys(types);
-// 缓存
-const types_cache = {};
-/**
- * 根据文件扩展名 获取MIME
- * @param ext {String}
- * @returns {String}
- */
-function getType (ext) {
-  // 查看缓存
-  if (types_cache[ext]) {
-    return types_cache[ext];
+class MIME {
+  constructor () {
+    // 获取所有MIME
+    this.types_keys = Object.keys(types);
+    // 缓存
+    this.types_cache = {};
   }
-  let res_type = '';
-  // 遍历查找
-  types_keys.some((key) => {
-    if (types[key].includes(ext)) {
-      // 缓存MIME
-      types_cache[ext] = key;
-      res_type = key;
-      return true;
+
+  /**
+   * 根据文件扩展名 获取MIME
+   * @param ext {String}
+   * @returns {String}
+   */
+  getType (ext) {
+    // 查看缓存
+    if (this.types_cache[ext]) {
+      return this.types_cache[ext];
     }
-    return false;
-  });
-  return res_type;
+    let res_type = '';
+    // 遍历查找
+    this.types_keys.some((key) => {
+      if (types[key].includes(ext)) {
+        // 缓存MIME
+        this.types_cache[ext] = key;
+        res_type = key;
+        return true;
+      }
+      return false;
+    });
+    return res_type;
+  }
 }
 
-module.exports = {
-  getType,
-}
+module.exports = new MIME();
