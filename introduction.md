@@ -153,7 +153,7 @@ Node.js 周边的生态非常强大，NPM（Node包管理器）上有超过 **73
 
 | 名称 | 描述 | 简写 |
 | --- | --- | --- |
-| npm install xxx | 安装xxx模块, 会默记录到package.json里dependencies, 添加到生产环境依赖 | npm i xxx |
+| npm install xxx | 安装xxx模块, 会默认记录到package.json里dependencies, 添加到生产环境依赖 | npm i xxx |
 | npm install --save xxx | 安装xxx模块，并且记录到package.json里dependencies，添加到生产环境依赖 | npm i -S xxx |
 | npm install --save-dev xxx | 安装xxx模块，并且记录到package.json里，字段对应的devDependencies，是开发环境必须依赖的模块，比如测试模块的（mocha、chai、sinon、zombie、supertest等）,语法检查模块 ( eslint 等) | npm i -D xxx |
 | npm install --global xxx | 全局安装xxx模块，但不记录到package.json里，如果模块里package.json有bin配置，会自动链接，作为cli命令 | npm i -g xxx |
