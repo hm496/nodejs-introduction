@@ -495,6 +495,25 @@ promise1().then(value1 => promise2(value1)).then(value2 => promise3(value2)).the
     console.log("最终结果:" + value4)
 })
 ```
+```javascript
+// 读取文件
+fs.readFile("user.txt", function (err, data) {
+    // 处理错误 和 正常逻辑
+});
+
+// 改造为 promise
+let fs_promise = function (path) {
+    return new Promise((resolve,reject) => {
+       fs.readFile(path, function (err, data) {
+       		if(err){
+                reject(err)
+            } else {
+                resolve(data)
+            }
+       });
+    })
+}
+```
 
 #### 5) 终极解决方案 async / await  :
 
