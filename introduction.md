@@ -10,7 +10,7 @@ Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine.
 
 - Node.js 构建在著名的 Chrome's V8 引擎之上，Chrome V8 引擎以 C/C++ 为主，用于执行 JavaScript 代码，并转成 C/C++ 调用，大大的降低了学习成本
 
-- 事件驱动（event-driven），非阻塞异步 I/O 模型（non-blocking I/O model），就是每个I/O操作都是异步的，最后由 C/C++ 编写的事件循环处理库来处理这些 I/O 操作，隐藏了非阻塞 I/O 的具体细节，简化并发编程模型，让你可以轻松的编写高性能的Web应用，所以它是轻量（lightweight）且高效（efficient）的
+- Node.js  基于事件驱动（event-driven），非阻塞异步 I/O 模型（non-blocking I/O model），就是每个I/O操作都是异步的，最后由 C/C++ 编写的事件循环处理库来处理这些 I/O 操作，隐藏了非阻塞 I/O 的具体细节，简化并发编程模型，让你可以轻松的编写高性能的Web应用，所以它是轻量（lightweight）且高效（efficient）的
 
   ![chrome vs nodejs](https://raw.githubusercontent.com/hm496/nodejs-introduction/master/img/chrome_nodejs.png)
 
